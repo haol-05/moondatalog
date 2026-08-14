@@ -1,0 +1,8 @@
+import {
+  "haol-05/moondatalog",
+  "moonbitlang/x/fs",
+  "moonbitlang/x/sys",
+  "moonbitlang/core/env",
+}
+
+pkgtype(kind: "executable")
