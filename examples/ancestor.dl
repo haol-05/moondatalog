@@ -1,0 +1,18 @@
+% 示例 1：家族谱系传递闭包（transitive closure）
+% 运行：moon run cmd/main -- examples/ancestor.dl
+
+% 事实：父母关系
+parent(alice, bob).
+parent(bob, carol).
+parent(carol, dave).
+parent(bob, eve).
+
+% 规则：祖先关系
+ancestor(X, Y) :- parent(X, Y).
+ancestor(X, Z) :- ancestor(X, Y), parent(Y, Z).
+
+% 查询：carol 的所有祖先
+?- ancestor(X, carol).
+
+% 查询：alice 的所有后代
+?- ancestor(alice, Y).

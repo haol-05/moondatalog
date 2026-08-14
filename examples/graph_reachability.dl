@@ -1,0 +1,22 @@
+% 示例 2：图可达性与分层否定（stratified negation）
+% 运行：moon run cmd/main -- examples/graph_reachability.dl
+
+node(a).
+node(b).
+node(c).
+node(d).
+node(e).
+
+edge(a, b).
+edge(b, c).
+edge(c, d).
+
+% 从 a 出发可达的节点
+reachable(X) :- node(X), edge(a, X).
+reachable(X) :- reachable(Y), edge(Y, X).
+
+% 从 a 出发不可达的节点（否定）
+unreachable(X) :- node(X), not reachable(X).
+
+?- reachable(X).
+?- unreachable(X).
