@@ -1,0 +1,230 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "username/moondatalog"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/hashmap",
+  "moonbitlang/core/hashset",
+}
+
+// Values
+pub fn compare_values(Value, Value) -> Int
+
+pub fn evaluate(Program) -> Result[EvalResult, DlError]
+
+pub fn float_const(Double) -> Value
+
+pub fn from_literal(String) -> Value
+
+pub fn int_const(Int64) -> Value
+
+pub fn is_variable_name(String) -> Bool
+
+pub fn lex(String) -> Result[Tokens, DlError]
+
+pub fn make_tuple(Array[Value]) -> Tuple
+
+pub fn new_relation(Int) -> Relation
+
+pub fn parse(String) -> Result[Program, DlError]
+
+pub fn parse_float(String) -> Value?
+
+pub fn parse_int(String) -> Value?
+
+pub fn relation_names(EvalResult) -> Array[String]
+
+pub fn render_agg(Aggregate) -> String
+
+pub fn render_atom(Atom) -> String
+
+pub fn render_body_item(BodyItem) -> String
+
+pub fn render_cmp(Cmp) -> String
+
+pub fn render_query(Query) -> String
+
+pub fn render_rule(Rule) -> String
+
+pub fn render_term(Term) -> String
+
+pub fn str_const(String) -> Value
+
+pub fn stratify(Array[Rule]) -> Result[Array[Array[Rule]], DlError]
+
+pub fn sym(String) -> Value
+
+// Errors
+
+// Types and methods
+pub enum AggFunc {
+  Count
+  Sum
+  Min
+  Max
+  Avg
+} derive(Eq, @debug.Debug)
+
+pub struct Aggregate {
+  agg_var : String
+  func : AggFunc
+  agg_vars : Array[String]
+  pos : Pos
+} derive(Eq, @debug.Debug)
+
+pub struct Atom {
+  pred : String
+  args : Array[Term]
+  pos : Pos
+} derive(Eq, @debug.Debug)
+
+pub enum BinOp {
+  Add
+  Sub
+  Mul
+  Div
+  Mod
+} derive(Eq, @debug.Debug)
+
+pub enum BodyItem {
+  Pos(Atom)
+  Neg(Atom)
+  Cmp(Cmp)
+  Agg(Aggregate)
+} derive(Eq, @debug.Debug)
+
+pub struct Cmp {
+  op : CmpOp
+  lhs : Term
+  rhs : Term
+  pos : Pos
+} derive(Eq, @debug.Debug)
+
+pub enum CmpOp {
+  Eq
+  Ne
+  Lt
+  Le
+  Gt
+  Ge
+} derive(Eq, @debug.Debug)
+
+pub enum DlError {
+  LexError(Pos, String)
+  ParseError(Pos, String)
+  SemanticError(String)
+  EvalError(String)
+} derive(Eq, @debug.Debug)
+pub fn DlError::to_string(Self) -> String
+
+pub struct EvalResult {
+  relations : @hashmap.HashMap[String, Relation]
+  answers : Array[Array[Tuple]]
+}
+
+pub struct Pos {
+  line : Int
+  col : Int
+} derive(Eq, @debug.Debug)
+pub impl Show for Pos
+
+pub struct Program {
+  rules : Array[Rule]
+  queries : Array[Query]
+} derive(Eq, @debug.Debug)
+
+pub struct Query {
+  body : Array[BodyItem]
+  pos : Pos
+} derive(Eq, @debug.Debug)
+
+pub struct Relation {
+  arity : Int
+  tuples : @hashset.HashSet[Tuple]
+  idx0 : @hashmap.HashMap[Value, @hashset.HashSet[Tuple]]
+}
+pub fn Relation::arity(Self) -> Int
+pub fn Relation::clear(Self) -> Unit
+pub fn Relation::contains(Self, Tuple) -> Bool
+pub fn Relation::insert(Self, Tuple) -> Bool
+pub fn Relation::insert_all(Self, Iter[Tuple]) -> Int
+pub fn Relation::iter(Self) -> Iter[Tuple]
+pub fn Relation::length(Self) -> Int
+pub fn Relation::lookup0(Self, Value) -> Iter[Tuple]
+pub fn Relation::to_string(Self) -> String
+
+pub struct Rule {
+  head : Atom
+  body : Array[BodyItem]
+  pos : Pos
+} derive(Eq, @debug.Debug)
+
+pub enum Term {
+  Const(Value)
+  Var(String)
+  Neg(Term)
+  Arith(BinOp, Term, Term)
+} derive(Eq, @debug.Debug)
+
+pub enum TokKind {
+  Ident(String)
+  IntLit(String)
+  FloatLit(String)
+  StrLit(String)
+  LParen
+  RParen
+  Comma
+  Dot
+  Colon
+  LBrace
+  RBrace
+  ColonDash
+  QuestionDash
+  Not
+  Eq
+  Ne
+  Lt
+  Le
+  Gt
+  Ge
+  Plus
+  Minus
+  Star
+  Slash
+  Percent
+  Eof
+} derive(Eq, @debug.Debug)
+pub fn TokKind::describe(Self) -> String
+
+pub struct Token {
+  kind : TokKind
+  pos : Pos
+} derive(Eq, @debug.Debug)
+
+pub struct Tokens {
+  items : Array[Token]
+}
+pub fn Tokens::get(Self, Int) -> Token
+pub fn Tokens::length(Self) -> Int
+
+pub struct Tuple {
+  elems : Array[Value]
+}
+pub fn Tuple::get(Self, Int) -> Value
+pub fn Tuple::length(Self) -> Int
+pub fn Tuple::to_string(Self) -> String
+pub impl Compare for Tuple
+pub impl Eq for Tuple
+pub impl Hash for Tuple
+
+pub enum Value {
+  Sym(String)
+  Str(String)
+  Int(Int64)
+  Float(Double)
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub impl Show for Value
+
+// Type aliases
+
+// Traits
