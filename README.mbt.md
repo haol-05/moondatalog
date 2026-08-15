@@ -1,25 +1,26 @@
-﻿# MoonDatalog
+# MoonDatalog
 
-一个用纯 [MoonBit](https://www.moonbitlang.com/) 实现的 **Datalog 查询引擎**。
+一个用纯 [MoonBit](https://www.moonbitlang.com/) 实现的 **Datalog 查询引擎**，带 **形式化验证** 与完整工程化交付。
 
-Datalog 是一种声明式逻辑查询语言，广泛应用于图分析、静态分析、数据血缘追踪与配置校验等场景。本项目实现了一个边界清晰、可嵌入的 Datalog 引擎子集，包含：
+Datalog 是一种声明式逻辑查询语言，广泛应用于图分析、静态分析、数据血缘追踪与配置校验等场景。本项目实现了一个边界清晰、可嵌入、**经过机器校验** 的 Datalog 引擎，包含：
 
-- **事实 / 规则 / 查询**：经典的 `p(...).`、`h(...) :- b1, b2.`、`?- ...` 语法
-- **递归**：传递闭包等递归规则，采用 bottom-up **半朴素（semi-naive）** 求值
-- **算术与比较**：`+ - * / %`、`= != < <= > >=`，支持整数与浮点
-- **分层否定（stratified negation）**：`not p(...)`，通过 SCC 分层保证语义良定义
-- **聚合**：Soufflé 风格的 `count / sum / min / max / avg`
-- **类型安全与错误检查**：未定义谓词、元数不一致、不安全规则、不可分层否定等均在求值前报错
+- **事实 / 规则 / 查询**：`p(...).`、`h(...) :- b1, b2.`、`?- ...`
+- **递归**：bottom-up **半朴素（semi-naive）** 求值
+- **算术与比较**：`+ - * / %`、`= != < <= > >=`（整数与浮点）
+- **分层否定**：`not p(...)`，Tarjan SCC 自动分层
+- **聚合**：Soufflé 风格 `count / sum / min / max / avg`
+- **静态检查**：未定义谓词、元数不一致、不安全规则等在求值前报错
+- **形式化验证**：核心纯函数经 `moon prove` 机器校验
+- **工程化交付**：发布到 mooncakes.io，含 CI、50+ 测试、CLI 与示例
 
 ## 快速开始
 
-安装 MoonBit 工具链后，在项目根目录运行测试：
-
 ```bash
-moon test
+moon test           # 运行 50 个测试
+moon prove verified # 形式化验证（需 Z3 等 SMT 求解器）
 ```
 
-运行示例程序：
+运行示例：
 
 ```bash
 moon run cmd/main -- examples/ancestor.dl
@@ -27,9 +28,11 @@ moon run cmd/main -- examples/graph_reachability.dl
 moon run cmd/main -- examples/aggregation.dl
 ```
 
+> Windows 提示：`moon prove` 前请将 `TMP`/`TEMP` 指向不含非 ASCII 字符的目录（如 `C:\Temp`）。
+
 ## 作为库使用
 
-```moonbit nocheck
+```moonbit
 import {
   "haol-05/moondatalog",
 }
@@ -49,40 +52,28 @@ match @moondatalog.parse(src) {
 }
 ```
 
-公开 API：
-
-| 函数 | 说明 |
-| --- | --- |
-| `parse(String) -> Result[Program, DlError]` | 解析 Datalog 源码为 AST |
-| `evaluate(Program) -> Result[EvalResult, DlError]` | 求值并回答查询 |
-| `EvalResult.relations` | 全部关系（事实 + 推导结果） |
-| `EvalResult.answers` | 每个查询的答案元组 |
-| `relation_names(EvalResult)` | 全部谓词名（排序） |
-| `render_query / render_rule / render_atom` | 将 AST 渲染为可读文本 |
-
 ## 语言语法
 
 ```
-% 注释（也支持 // 与 /* ... */）
-
-% 事实：谓词(常量...).
 parent(alice, bob).
-
-% 规则：头 :- 体.
 ancestor(X, Y) :- parent(X, Y).
 ancestor(X, Z) :- ancestor(X, Y), parent(Y, Z).
-
-% 否定与比较
 safe(X) :- node(X), not danger(X), X != secret.
-
-% 聚合（Soufflé 风格）
 dept_size(D, N) :- employee(X, D), N = count : { X }.
-
-% 查询
 ?- ancestor(X, carol).
 ```
 
-约定：变量以大写字母开头，`_` 为匿名变量；小写标识符为符号常量；字符串用双引号；匿名变量不作为聚合分组键。
+变量以大写字母开头，`_` 为匿名变量；小写标识符为符号常量；字符串用双引号；匿名变量不作为聚合分组键。
+
+## 形式化验证
+
+`verified/` 子包通过 `moon prove` 对核心纯函数机器校验：
+
+| 函数 | 契约 |
+| --- | --- |
+| `clamp(x, lo, hi)` | 返回值在 `[lo, hi]` 内 |
+| `bounded_sum(xs, lo, hi)` | 总和在 `[lo*len, hi*len]` 内 |
+| `index_of_max(xs)` | 返回全局最大值的下标 |
 
 ## 许可证
 
