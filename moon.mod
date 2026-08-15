@@ -1,4 +1,4 @@
-// Learn more about moon.mod configuration:
+﻿// Learn more about moon.mod configuration:
 // https://docs.moonbitlang.com/en/latest/toolchain/moon/module.html
 //
 // To add a dependency, run this command in your terminal:
@@ -11,7 +11,7 @@
 
 name = "haol-05/moondatalog"
 
-version = "0.1.0"
+version = "0.1.1"
 
 readme = "README.mbt.md"
 
