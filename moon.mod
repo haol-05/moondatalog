@@ -25,11 +25,12 @@ keywords = [
   "logic-programming",
   "database",
   "graph",
+  "formal-verification",
 ]
 
 preferred_target = "wasm"
 
-description = "A pure MoonBit Datalog query engine with recursion, stratified negation and aggregation."
+description = "A pure MoonBit Datalog query engine with stratified negation, aggregation, static checks and moon prove formal verification."
 
 import {
   "moonbitlang/x@0.4.49",

@@ -1,0 +1,52 @@
+// MoonDatalog —— 形式化验证：逻辑侧谓词（.mbtp）
+//
+// 本文件定义 verified.mbt 中函数所需的逻辑规范（谓词与后置条件），
+// 由 `moon prove` 借助 SMT 求解器（Z3 / CVC5 / Alt-Ergo）机器校验。
+//
+// 运行验证：`moon prove`
+// Windows 注意：需将 TMP/TEMP 指向不含非 ASCII 字符的目录（如 C:\Temp），
+// 否则 Why3 生成的临时 SMT 文件路径会损坏，导致证明失败。
+
+///|
+/// clamp 的前置条件：下界不超过上界。
+predicate valid_bounds(lo : Int, hi : Int) {
+  lo <= hi
+}
+
+///|
+/// clamp 的后置条件：结果被夹在 [lo, hi] 之间。
+predicate clamped(lo : Int, hi : Int, result : Int) {
+  (result >= lo) && (result <= hi)
+}
+
+///|
+/// bounded_sum 的前置条件：数组每个元素都在 [lo, hi] 内。
+predicate in_range(xs : FixedArray[Int], lo : Int, hi : Int) {
+  ∀ i : Int, ((0 <= i) && (i < xs.length())) →
+    ((lo <= xs[i]) && (xs[i] <= hi))
+}
+
+///|
+/// bounded_sum 的后置条件：总和被夹在 lo*len 与 hi*len 之间。
+predicate sum_bounded(xs : FixedArray[Int], lo : Int, hi : Int, result : Int) {
+  (lo * xs.length() <= result) && (result <= hi * xs.length())
+}
+
+///|
+/// index_of_max 的前置条件：数组非空。
+predicate nonempty(xs : FixedArray[Int]) {
+  xs.length() > 0
+}
+
+///|
+/// 数组前缀 xs[0..len) 中，xs[best] 是最大值。
+predicate max_in_prefix(xs : FixedArray[Int], best : Int, len : Int) {
+  ∀ k : Int, ((0 <= k) && (k < len)) → xs[k] <= xs[best]
+}
+
+///|
+/// index_of_max 的后置条件：xs[idx] 是全局最大值。
+predicate is_max_index(xs : FixedArray[Int], idx : Int) {
+  ∀ k : Int, ((0 <= k) && (k < xs.length())) →
+    ((xs[k] <= xs[idx]) && (0 <= idx) && (idx < xs.length()))
+}
