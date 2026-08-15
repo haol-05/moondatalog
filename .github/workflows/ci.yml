@@ -26,3 +26,20 @@ jobs:
 
       - name: Build (all targets)
         run: moon build --target all
+
+  prove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MoonBit
+        uses: moonbitlang/core/.github/actions/setup@main
+
+      - name: Install Z3
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y z3
+          z3 --version
+
+      - name: Formal verification (moon prove)
+        run: moon prove verified
