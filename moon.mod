@@ -1,4 +1,4 @@
-﻿// Learn more about moon.mod configuration:
+// Learn more about moon.mod configuration:
 // https://docs.moonbitlang.com/en/latest/toolchain/moon/module.html
 //
 // To add a dependency, run this command in your terminal:
